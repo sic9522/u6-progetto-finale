@@ -12,4 +12,20 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+export function createPost(formData) {
+  return api.post('/api/posts', formData).then((res) => res.data)
+}
+
+export function listPosts() {
+  return api.get('/api/posts').then((res) => res.data)
+}
+
+export function geocodeAddress(address) {
+  return api.get('/api/geocode', { params: { address } }).then((res) => res.data)
+}
+
+export function reverseGeocode(latitude, longitude) {
+  return api.get('/api/geocode/reverse', { params: { latitude, longitude } }).then((res) => res.data)
+}
+
 export default api
