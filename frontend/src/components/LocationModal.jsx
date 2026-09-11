@@ -117,31 +117,59 @@ function LocationModal({ show, onClose, onConfirm }) {
     }
   }
 
+  // La prima posizione di getCurrentPosition e' spesso una triangolazione approssimata
+  // (wifi/cella): si ascoltano piu' letture con watchPosition e si tiene la piu' precisa
+  // (coords.accuracy piu' bassa), fermandosi appena e' abbastanza buona o dopo un tempo massimo.
+  // ponytail: soglia e attesa fisse (20m / 8s), da rendere configurabili se servisse altrove.
   function handleUseMyLocation() {
     if (!navigator.geolocation) {
       setError('Geolocalizzazione non supportata da questo browser')
       return
     }
+    const ACCURACY_TARGET_METERS = 20
+    const MAX_WAIT_MS = 8000
+
     setLocating(true)
     setError(null)
-    navigator.geolocation.getCurrentPosition(
+    let best = null
+
+    const finish = () => {
+      clearTimeout(timeoutId)
+      navigator.geolocation.clearWatch(watchId)
+      setLocating(false)
+      if (!best) {
+        return
+      }
+      const { latitude, longitude } = best
+      reverseGeocode(latitude, longitude)
+        .then((res) => setLocation({ latitude, longitude, address: res.formattedAddress ?? '' }))
+        .catch(() => setLocation({ latitude, longitude, address: '' }))
+    }
+
+    const timeoutId = setTimeout(finish, MAX_WAIT_MS)
+
+    const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        const { latitude, longitude } = position.coords
-        if (mapRef.current) {
-          mapRef.current.panTo({ lat: latitude, lng: longitude })
-          mapRef.current.setZoom(12)
-          placeMarker(mapRef.current, latitude, longitude)
+        const { latitude, longitude, accuracy } = position.coords
+        if (!best || accuracy < best.accuracy) {
+          best = { latitude, longitude, accuracy }
+          if (mapRef.current) {
+            mapRef.current.panTo({ lat: latitude, lng: longitude })
+            mapRef.current.setZoom(12)
+            placeMarker(mapRef.current, latitude, longitude)
+          }
         }
-        reverseGeocode(latitude, longitude)
-          .then((res) => setLocation({ latitude, longitude, address: res.formattedAddress ?? '' }))
-          .catch(() => setLocation({ latitude, longitude, address: '' }))
-          .finally(() => setLocating(false))
+        if (accuracy <= ACCURACY_TARGET_METERS) {
+          finish()
+        }
       },
       (geoError) => {
+        clearTimeout(timeoutId)
+        navigator.geolocation.clearWatch(watchId)
         setError(geoError.message)
         setLocating(false)
       },
-      { enableHighAccuracy: true, timeout: 10000 },
+      { enableHighAccuracy: true, timeout: MAX_WAIT_MS, maximumAge: 0 },
     )
   }
 
