@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Button, Container, Form, Spinner } from 'react-bootstrap'
+import { Alert, Button, Form, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import LocationPicker from '../components/LocationPicker'
 import PhotoPicker from '../components/PhotoPicker'
@@ -40,7 +40,7 @@ function CreatePost() {
   }
 
   return (
-    <Container className="py-4" style={{ maxWidth: 640 }}>
+    <div>
       <h1 className="h3 mb-4">Nuovo post</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-4">
@@ -59,7 +59,7 @@ function CreatePost() {
           {submitting ? <Spinner size="sm" animation="border" /> : 'Pubblica'}
         </Button>
       </Form>
-    </Container>
+    </div>
   )
 }
 

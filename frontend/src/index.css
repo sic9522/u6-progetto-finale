@@ -17,7 +17,7 @@
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -55,15 +55,38 @@ body {
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+/* Bootstrap ragiona in dodicesimi: qui servono i quinti (sidebar 1/5, body 3/5, sidebar 1/5). */
+.col-fifth {
+  flex: 0 0 20%;
+  max-width: 20%;
+}
+.col-three-fifths {
+  flex: 0 0 60%;
+  max-width: 60%;
+}
+@media (max-width: 767.98px) {
+  .col-fifth,
+  .col-three-fifths {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Frecce dello swiper delle foto: visibili solo al passaggio del mouse sul post. */
+.post-swiper .swiper-button-next,
+.post-swiper .swiper-button-prev {
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+.post-swiper:hover .swiper-button-next,
+.post-swiper:hover .swiper-button-prev {
+  opacity: 1;
 }
 
 h1,
