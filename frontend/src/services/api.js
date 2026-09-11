@@ -32,4 +32,12 @@ export function extractText(formData) {
   return api.post('/api/ocr', formData).then((res) => res.data)
 }
 
+export function login(username, password) {
+  return api.post('/api/auth/login', { username, password }).then((res) => res.data)
+}
+
+export function register(data) {
+  return api.post('/api/auth/register', data).then((res) => res.data)
+}
+
 export default api

@@ -1,6 +1,7 @@
 import { Container, Nav, Navbar, Row } from 'react-bootstrap'
 import { NavLink, Outlet } from 'react-router-dom'
 import Footer from '../components/Footer'
+import LoginMenu from '../components/LoginMenu'
 import NewsSidebar from '../components/NewsSidebar'
 import Sidebar from '../components/Sidebar'
 
@@ -32,7 +33,9 @@ function Layout() {
                 </Nav.Link>
               </Nav>
             </div>
-            <div className="col-fifth" />
+            <div className="col-fifth px-3 d-flex justify-content-end">
+              <LoginMenu />
+            </div>
           </Row>
         </Container>
       </Navbar>

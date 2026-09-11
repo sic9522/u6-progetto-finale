@@ -30,12 +30,41 @@ public class User {
 	@Column(name = "username", nullable = false, unique = true, length = 50)
 	private String username;
 
+	@Column(name = "first_name", length = 100)
+	private String firstName;
+
+	@Column(name = "last_name", length = 100)
+	private String lastName;
+
+	@Column(name = "email", unique = true, length = 255)
+	private String email;
+
+	@Column(name = "password_hash")
+	private String passwordHash;
+
+	@Column(name = "age")
+	private Integer age;
+
+	@Column(name = "gender", length = 20)
+	private String gender;
+
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;
 
 	public User(String username) {
 		this.username = username;
+	}
+
+	public User(String firstName, String lastName, String email, String username, String passwordHash, Integer age,
+			String gender) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.username = username;
+		this.passwordHash = passwordHash;
+		this.age = age;
+		this.gender = gender;
 	}
 
 }
