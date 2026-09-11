@@ -27,8 +27,8 @@ function Layout() {
                 <Nav.Link as={NavLink} to="/amici">
                   Amici
                 </Nav.Link>
-                <Nav.Link as={NavLink} to="/notifiche">
-                  Notifiche
+                <Nav.Link as={NavLink} to="/canale">
+                  Canale
                 </Nav.Link>
               </Nav>
             </div>
