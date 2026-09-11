@@ -20,10 +20,6 @@ export function listPosts() {
   return api.get('/api/posts').then((res) => res.data)
 }
 
-export function geocodeAddress(address) {
-  return api.get('/api/geocode', { params: { address } }).then((res) => res.data)
-}
-
 export function reverseGeocode(latitude, longitude) {
   return api.get('/api/geocode/reverse', { params: { latitude, longitude } }).then((res) => res.data)
 }

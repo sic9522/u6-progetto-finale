@@ -18,6 +18,14 @@ function PhotoPicker({ files, onChange }) {
     }
   }, [])
 
+  // Il tag <video> esiste nel DOM solo quando cameraOn e' true: va collegato qui,
+  // dopo il render, non subito dopo getUserMedia (a quel punto il ref e' ancora null).
+  useEffect(() => {
+    if (cameraOn && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+    }
+  }, [cameraOn])
+
   async function startCamera() {
     setCameraError(null)
     try {
@@ -25,9 +33,6 @@ function PhotoPicker({ files, onChange }) {
         video: { facingMode: 'environment', width: { ideal: 1920 } },
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
       setCameraOn(true)
     } catch (err) {
       setCameraError(describeError(err))

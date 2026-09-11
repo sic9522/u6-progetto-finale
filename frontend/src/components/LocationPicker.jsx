@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { Button, Form, InputGroup, Spinner } from 'react-bootstrap'
+import { Button, Spinner } from 'react-bootstrap'
 import { useGoogleMaps } from '../hooks/useGoogleMaps'
-import { geocodeAddress, reverseGeocode } from '../services/api'
+import { reverseGeocode } from '../services/api'
 
 const DEFAULT_CENTER = { lat: 41.9028, lng: 12.4964 } // Roma, usata solo finche' non si sceglie una posizione
 
 function LocationPicker({ value, onChange }) {
-  const { maps, error: mapsError } = useGoogleMaps()
+  const { maps, places, marker, error: mapsError } = useGoogleMaps()
   const containerRef = useRef(null)
   const mapRef = useRef(null)
   const markerRef = useRef(null)
-  const [addressInput, setAddressInput] = useState(value?.address ?? '')
-  const [searching, setSearching] = useState(false)
+  const autocompleteContainerRef = useRef(null)
+  const autocompleteElementRef = useRef(null)
   const [locating, setLocating] = useState(false)
   const [error, setError] = useState(null)
 
@@ -22,7 +22,9 @@ function LocationPicker({ value, onChange }) {
     }
     const map = new maps.Map(containerRef.current, {
       center: value ? { lat: value.latitude, lng: value.longitude } : DEFAULT_CENTER,
-      zoom: value ? 15 : 5,
+      zoom: value ? 15 : 9,
+      // Obbligatorio per usare AdvancedMarkerElement: senza un mapId il marker non si crea.
+      mapId: 'DEMO_MAP_ID',
       streetViewControl: false,
       mapTypeControl: false,
       fullscreenControl: false,
@@ -34,10 +36,9 @@ function LocationPicker({ value, onChange }) {
       onChange({ latitude: lat, longitude: lng, address: '' })
       reverseGeocode(lat, lng)
         .then((res) => {
-          setAddressInput(res.formattedAddress ?? '')
           onChange({ latitude: lat, longitude: lng, address: res.formattedAddress ?? '' })
         })
-        // il reverse geocoding e' solo per compilare il campo indirizzo: se fallisce si tiene comunque la posizione scelta
+        // il reverse geocoding e' solo per compilare l'indirizzo mostrato: se fallisce si tiene comunque la posizione scelta
         .catch(() => {})
     })
     mapRef.current = map
@@ -48,11 +49,37 @@ function LocationPicker({ value, onChange }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maps])
 
+  // Widget di ricerca indirizzo di Google (PlaceAutocompleteElement): si crea una volta
+  // sola e si monta nel container. Sostituisce il vecchio google.maps.places.Autocomplete,
+  // dismesso da Google per i progetti creati dopo marzo 2025.
+  useEffect(() => {
+    if (!places || !autocompleteContainerRef.current || autocompleteElementRef.current) {
+      return
+    }
+    const autocompleteElement = new places.PlaceAutocompleteElement()
+    autocompleteContainerRef.current.appendChild(autocompleteElement)
+    autocompleteElement.addEventListener('gmp-select', async ({ placePrediction }) => {
+      const place = placePrediction.toPlace()
+      await place.fetchFields({ fields: ['location', 'formattedAddress'] })
+      if (!place.location) {
+        return
+      }
+      const lat = place.location.lat()
+      const lng = place.location.lng()
+      const address = place.formattedAddress ?? ''
+      recenter(lat, lng)
+      setError(null)
+      onChange({ latitude: lat, longitude: lng, address })
+    })
+    autocompleteElementRef.current = autocompleteElement
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [places])
+
   function placeMarker(map, lat, lng) {
     if (markerRef.current) {
-      markerRef.current.setPosition({ lat, lng })
+      markerRef.current.position = { lat, lng }
     } else {
-      markerRef.current = new maps.Marker({ map, position: { lat, lng } })
+      markerRef.current = new marker.AdvancedMarkerElement({ map, position: { lat, lng } })
     }
   }
 
@@ -63,25 +90,6 @@ function LocationPicker({ value, onChange }) {
     mapRef.current.panTo({ lat, lng })
     mapRef.current.setZoom(15)
     placeMarker(mapRef.current, lat, lng)
-  }
-
-  async function handleSearch(event) {
-    event.preventDefault()
-    if (!addressInput.trim()) {
-      return
-    }
-    setSearching(true)
-    setError(null)
-    try {
-      const res = await geocodeAddress(addressInput)
-      recenter(res.latitude, res.longitude)
-      setAddressInput(res.formattedAddress ?? addressInput)
-      onChange({ latitude: res.latitude, longitude: res.longitude, address: res.formattedAddress ?? addressInput })
-    } catch (err) {
-      setError(err.response?.data?.message ?? 'Indirizzo non trovato')
-    } finally {
-      setSearching(false)
-    }
   }
 
   function handleUseMyLocation() {
@@ -97,11 +105,9 @@ function LocationPicker({ value, onChange }) {
         recenter(latitude, longitude)
         reverseGeocode(latitude, longitude)
           .then((res) => {
-            setAddressInput(res.formattedAddress ?? '')
             onChange({ latitude, longitude, address: res.formattedAddress ?? '' })
           })
           .catch(() => {
-            setAddressInput('')
             onChange({ latitude, longitude, address: '' })
           })
           .finally(() => setLocating(false))
@@ -110,15 +116,17 @@ function LocationPicker({ value, onChange }) {
         setError(geoError.message)
         setLocating(false)
       },
+      // Senza high accuracy il browser tende a rispondere subito con una posizione
+      // dedotta solo dall'IP, che su desktop puo' sbagliare di centinaia di km.
+      { enableHighAccuracy: true, timeout: 10000 },
     )
   }
 
   function handleRemove() {
     if (markerRef.current) {
-      markerRef.current.setMap(null)
+      markerRef.current.map = null
       markerRef.current = null
     }
-    setAddressInput('')
     setError(null)
     onChange(null)
   }
@@ -130,19 +138,7 @@ function LocationPicker({ value, onChange }) {
   return (
     <div>
       <div className="d-flex gap-2 mb-2 flex-wrap">
-        <Form onSubmit={handleSearch} className="d-flex flex-grow-1">
-          <InputGroup>
-            <Form.Control
-              placeholder="Cerca un indirizzo..."
-              value={addressInput}
-              onChange={(event) => setAddressInput(event.target.value)}
-              disabled={!maps}
-            />
-            <Button type="submit" variant="outline-secondary" disabled={!maps || searching}>
-              {searching ? <Spinner size="sm" animation="border" /> : 'Cerca'}
-            </Button>
-          </InputGroup>
-        </Form>
+        <div ref={autocompleteContainerRef} style={{ flexGrow: 1, minWidth: 240 }} />
         <Button type="button" variant="outline-secondary" onClick={handleUseMyLocation} disabled={!maps || locating}>
           {locating ? <Spinner size="sm" animation="border" /> : 'Usa la mia posizione'}
         </Button>
@@ -160,7 +156,7 @@ function LocationPicker({ value, onChange }) {
           </Button>
         </div>
       ) : (
-        <small className="text-muted">Clicca sulla mappa, cerca un indirizzo o usa la tua posizione.</small>
+        <small className="text-muted">Cerca un indirizzo, clicca sulla mappa o usa la tua posizione.</small>
       )}
     </div>
   )
