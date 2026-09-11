@@ -2,7 +2,7 @@
    5.3 (che molti componenti - card, navbar, form, modal - leggono davvero a runtime), cosi'
    un unico file rifà lo stile a tutta l'app senza dover toccare ogni singolo componente. */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap');
 
 :root {
   /* Palette "Social Media App": rosa come colore del brand, blu per le azioni principali. */
@@ -113,6 +113,27 @@ h6,
 /* Pallino attivo del carosello foto, coerente con il resto della palette. */
 .post-swiper {
   --swiper-theme-color: var(--brand-primary);
+}
+
+/* Card delle notizie finte in sidebar: aspetto da trafiletto di giornale, con leggero sollevamento al passaggio. */
+.news-card:hover {
+  transform: translateY(-2px);
+}
+.news-card-kicker {
+  font-family: 'Work Sans', var(--bs-body-font-family);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+}
+.news-card-headline {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  border-bottom: 1px solid var(--brand-border);
+  padding-bottom: 0.25rem;
 }
 
 /* Campo "a cosa stai pensando" del composer: si fonde nella card, niente bordo/riquadro. */
