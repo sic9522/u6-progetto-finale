@@ -50,6 +50,9 @@ public class Post {
 	@Column(name = "address", length = 255)
 	private String address;
 
+	@Column(name = "description", length = 2000)
+	private String description;
+
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;

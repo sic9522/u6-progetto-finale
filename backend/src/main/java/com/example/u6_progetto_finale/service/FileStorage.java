@@ -23,4 +23,12 @@ public class FileStorage {
 		}
 	}
 
+	public void delete(Path directory, String key) {
+		try {
+			Files.deleteIfExists(directory.resolve(key));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
 }

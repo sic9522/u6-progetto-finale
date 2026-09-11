@@ -13,6 +13,7 @@ public record PostResponse(
 		BigDecimal latitude,
 		BigDecimal longitude,
 		String address,
+		String description,
 		Instant createdAt,
 		List<PhotoResponse> photos) {
 
@@ -23,6 +24,7 @@ public record PostResponse(
 			post.getLatitude(),
 			post.getLongitude(),
 			post.getAddress(),
+			post.getDescription(),
 			post.getCreatedAt(),
 			post.getPhotos().stream().map(PhotoResponse::from).toList());
 	}

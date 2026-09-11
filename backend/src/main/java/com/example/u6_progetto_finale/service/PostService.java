@@ -52,7 +52,8 @@ public class PostService {
 		this.photosDir = Path.of(properties.dir()).toAbsolutePath();
 	}
 
-	public PostResponse createPost(MultipartFile[] files, BigDecimal latitude, BigDecimal longitude, String address) {
+	public PostResponse createPost(MultipartFile[] files, BigDecimal latitude, BigDecimal longitude, String address,
+			String description) {
 		validate(files);
 
 		User author = userRepository.findByUsername(DataSeeder.DEFAULT_USERNAME)
@@ -62,6 +63,7 @@ public class PostService {
 		post.setLatitude(latitude);
 		post.setLongitude(longitude);
 		post.setAddress(address == null || address.isBlank() ? null : address.strip());
+		post.setDescription(description == null || description.isBlank() ? null : description.strip());
 
 		for (MultipartFile file : files) {
 			byte[] content = MultipartFiles.readBytes(file);
@@ -81,6 +83,15 @@ public class PostService {
 		return postRepository.findById(id)
 			.map(PostResponse::from)
 			.orElseThrow(() -> new NotFoundException("post " + id + " non trovato"));
+	}
+
+	public void deletePost(UUID id) {
+		Post post = postRepository.findById(id)
+			.orElseThrow(() -> new NotFoundException("post " + id + " non trovato"));
+		for (Photo photo : post.getPhotos()) {
+			fileStorage.delete(photosDir, photo.getStorageKey());
+		}
+		postRepository.delete(post);
 	}
 
 	public ResponseEntity<byte[]> readPhotoContent(UUID photoId) {
