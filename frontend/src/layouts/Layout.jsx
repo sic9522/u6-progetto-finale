@@ -1,11 +1,16 @@
 import { Container, Nav, Navbar, Row } from 'react-bootstrap'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import AuthModal from '../components/AuthModal'
 import Footer from '../components/Footer'
 import LoginMenu from '../components/LoginMenu'
 import NewsSidebar from '../components/NewsSidebar'
+import ProfileChannelsAside from '../components/ProfileChannelsAside'
+import ProfileSidebar from '../components/ProfileSidebar'
 import Sidebar from '../components/Sidebar'
 
 function Layout() {
+  const isProfile = useLocation().pathname === '/profilo'
+
   return (
     <div className="vh-100 d-flex flex-column">
       <Navbar bg="light" className="border-bottom flex-shrink-0">
@@ -45,19 +50,20 @@ function Layout() {
         <Container fluid className="h-100">
           <Row className="h-100 g-0">
             <div className="col-fifth border-end px-3 py-4 h-100 overflow-auto">
-              <Sidebar />
+              {isProfile ? <ProfileSidebar /> : <Sidebar />}
             </div>
             <div className="col-three-fifths px-4 py-4 h-100 overflow-auto">
               <Outlet />
             </div>
             <div className="col-fifth border-start px-3 py-4 h-100 overflow-auto">
-              <NewsSidebar />
+              {isProfile ? <ProfileChannelsAside /> : <NewsSidebar />}
             </div>
           </Row>
         </Container>
       </div>
 
       <Footer />
+      <AuthModal />
     </div>
   )
 }

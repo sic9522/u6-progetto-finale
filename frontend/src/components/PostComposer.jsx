@@ -2,6 +2,7 @@ import { Camera, Eye, MapPin, Plus, X } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Alert, Button, Col, Form, Image, Modal, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { createPost } from '../services/api'
 import LocationModal from './LocationModal'
 import OcrModal from './OcrModal'
@@ -9,19 +10,21 @@ import PhotoModal, { MAX_PHOTOS } from './PhotoModal'
 import PostPreviewModal from './PostPreviewModal'
 import TextPreviewModal from './TextPreviewModal'
 
-function Avatar() {
+function Avatar({ username }) {
   return (
     <div
       className="rounded-circle avatar-circle text-white d-flex align-items-center justify-content-center flex-shrink-0"
       style={{ width: 40, height: 40, fontWeight: 600 }}
     >
-      D
+      {username.charAt(0).toUpperCase()}
     </div>
   )
 }
 
 function PostComposer() {
   const navigate = useNavigate()
+  const { username: loggedInUsername } = useAuth()
+  const username = loggedInUsername ?? 'anonimo'
   const [expanded, setExpanded] = useState(false)
   const [message, setMessage] = useState('')
   const [description, setDescription] = useState('')
@@ -132,21 +135,21 @@ function PostComposer() {
     <div>
       {!expanded ? (
         <div className="d-flex align-items-center gap-2 mb-3">
-          <Avatar />
+          <Avatar username={username} />
           <button
             type="button"
             className="flex-grow-1 rounded-pill bg-light border px-3 py-2 text-muted text-start"
             onClick={() => setExpanded(true)}
           >
-            A cosa stai pensando, demo?
+            A cosa stai pensando, {username}?
           </button>
         </div>
       ) : (
         <div className="border rounded-3 p-3 mb-3">
           <div className="d-flex align-items-center justify-content-between mb-2">
             <div className="d-flex align-items-center gap-2">
-              <Avatar />
-              <span className="fw-semibold">demo</span>
+              <Avatar username={username} />
+              <span className="fw-semibold">{username}</span>
             </div>
             <button
               type="button"
@@ -230,7 +233,7 @@ function PostComposer() {
                 style={{ paddingRight: '4.5rem' }}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="A cosa stai pensando, demo?"
+                placeholder={`A cosa stai pensando, ${username}?`}
                 autoFocus
               />
               <div className="position-absolute top-0 end-0 d-flex">
@@ -339,6 +342,7 @@ function PostComposer() {
       <PostPreviewModal
         show={showPostPreview}
         onClose={() => setShowPostPreview(false)}
+        username={username}
         description={description}
         photos={photos}
         location={location}

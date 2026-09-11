@@ -16,8 +16,8 @@ export function createPost(formData) {
   return api.post('/api/posts', formData).then((res) => res.data)
 }
 
-export function listPosts() {
-  return api.get('/api/posts').then((res) => res.data)
+export function listPosts({ mine = false } = {}) {
+  return api.get('/api/posts', { params: { mine } }).then((res) => res.data)
 }
 
 export function deletePost(id) {

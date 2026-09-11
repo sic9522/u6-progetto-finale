@@ -26,6 +26,15 @@ function PostDescription({ text }) {
           </button>
         )}
       </div>
+      {truncated && expanded && (
+        <button
+          type="button"
+          className="btn btn-link btn-sm p-0 text-decoration-none"
+          onClick={() => setExpanded(false)}
+        >
+          Riduci descrizione
+        </button>
+      )}
     </div>
   )
 }

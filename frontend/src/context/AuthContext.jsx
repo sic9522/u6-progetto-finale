@@ -3,17 +3,25 @@ import { login as loginRequest, register as registerRequest } from '../services/
 
 const AuthContext = createContext(null)
 
-function readStoredUsername() {
-  return localStorage.getItem('token') ? localStorage.getItem('username') : null
+function readStoredProfile() {
+  if (!localStorage.getItem('token')) {
+    return null
+  }
+  try {
+    return JSON.parse(localStorage.getItem('profile'))
+  } catch {
+    return null
+  }
 }
 
 export function AuthProvider({ children }) {
-  const [username, setUsername] = useState(readStoredUsername)
+  const [profile, setProfile] = useState(readStoredProfile)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
-  function applySession({ token, username: sessionUsername }) {
+  function applySession({ token, ...rest }) {
     localStorage.setItem('token', token)
-    localStorage.setItem('username', sessionUsername)
-    setUsername(sessionUsername)
+    localStorage.setItem('profile', JSON.stringify(rest))
+    setProfile(rest)
   }
 
   async function login(usernameInput, password) {
@@ -26,12 +34,23 @@ export function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    setUsername(null)
+    localStorage.removeItem('profile')
+    setProfile(null)
   }
 
   return (
-    <AuthContext.Provider value={{ username, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        username: profile?.username ?? null,
+        profile,
+        login,
+        register,
+        logout,
+        showAuthModal,
+        openAuthModal: () => setShowAuthModal(true),
+        closeAuthModal: () => setShowAuthModal(false),
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )

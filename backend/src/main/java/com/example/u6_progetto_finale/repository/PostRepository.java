@@ -1,5 +1,6 @@
 package com.example.u6_progetto_finale.repository;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,4 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.u6_progetto_finale.entities.Post;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
+
+	List<Post> findAllByOrderByCreatedAtDesc();
+
+	List<Post> findByUser_UsernameOrderByCreatedAtDesc(String username);
+
 }

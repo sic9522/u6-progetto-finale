@@ -13,6 +13,9 @@ import java.util.UUID;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +25,7 @@ import com.example.u6_progetto_finale.entities.Photo;
 import com.example.u6_progetto_finale.entities.Post;
 import com.example.u6_progetto_finale.entities.User;
 import com.example.u6_progetto_finale.exceptions.BadRequestException;
+import com.example.u6_progetto_finale.exceptions.ForbiddenException;
 import com.example.u6_progetto_finale.exceptions.NotFoundException;
 import com.example.u6_progetto_finale.payloads.response.PostResponse;
 import com.example.u6_progetto_finale.repository.PhotoRepository;
@@ -56,7 +60,7 @@ public class PostService {
 			String description) {
 		validate(files);
 
-		User author = userRepository.findByUsername(DataSeeder.DEFAULT_USERNAME)
+		User author = userRepository.findByUsername(currentUsername())
 			.orElseThrow(() -> new NotFoundException("utente di default non trovato"));
 
 		Post post = new Post(author);
@@ -75,8 +79,11 @@ public class PostService {
 		return PostResponse.from(postRepository.save(post));
 	}
 
-	public List<PostResponse> listPosts() {
-		return postRepository.findAll().stream().map(PostResponse::from).toList();
+	public List<PostResponse> listPosts(boolean mine) {
+		List<Post> posts = mine
+			? postRepository.findByUser_UsernameOrderByCreatedAtDesc(currentUsername())
+			: postRepository.findAllByOrderByCreatedAtDesc();
+		return posts.stream().map(PostResponse::from).toList();
 	}
 
 	public PostResponse getPost(UUID id) {
@@ -88,6 +95,9 @@ public class PostService {
 	public void deletePost(UUID id) {
 		Post post = postRepository.findById(id)
 			.orElseThrow(() -> new NotFoundException("post " + id + " non trovato"));
+		if (!post.getUser().getUsername().equals(currentUsername())) {
+			throw new ForbiddenException("non puoi eliminare un post di un altro utente");
+		}
 		for (Photo photo : post.getPhotos()) {
 			fileStorage.delete(photosDir, photo.getStorageKey());
 		}
@@ -136,6 +146,15 @@ public class PostService {
 		if (!reasons.isEmpty()) {
 			throw new BadRequestException(String.join("; ", reasons));
 		}
+	}
+
+	/** Chi ha fatto login diventa l'autore del post; senza login resta l'utente di default. */
+	private String currentUsername() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null || auth instanceof AnonymousAuthenticationToken) {
+			return DataSeeder.DEFAULT_USERNAME;
+		}
+		return auth.getName();
 	}
 
 	private String extensionOf(String contentType) {

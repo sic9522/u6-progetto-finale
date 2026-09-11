@@ -4,6 +4,7 @@ import Channel from '../pages/Channel'
 import Friends from '../pages/Friends'
 import Home from '../pages/Home'
 import Profile from '../pages/Profile'
+import RequireAuth from './RequireAuth'
 
 function AppRoutes() {
   return (
@@ -11,9 +12,11 @@ function AppRoutes() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/profilo" element={<Profile />} />
-          <Route path="/amici" element={<Friends />} />
-          <Route path="/canale" element={<Channel />} />
+          <Route element={<RequireAuth />}>
+            <Route path="/profilo" element={<Profile />} />
+            <Route path="/amici" element={<Friends />} />
+            <Route path="/canale" element={<Channel />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

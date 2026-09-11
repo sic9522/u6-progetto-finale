@@ -40,7 +40,7 @@ public class AuthService {
 				passwordEncoder.encode(request.password()), request.age(), request.gender());
 		userRepository.save(user);
 
-		return new AuthResponse(jwtService.generateToken(user.getUsername()), user.getUsername());
+		return toAuthResponse(user);
 	}
 
 	public AuthResponse login(LoginRequest request) {
@@ -51,7 +51,12 @@ public class AuthService {
 			throw new UnauthorizedException("credenziali non valide");
 		}
 
-		return new AuthResponse(jwtService.generateToken(user.getUsername()), user.getUsername());
+		return toAuthResponse(user);
+	}
+
+	private AuthResponse toAuthResponse(User user) {
+		return new AuthResponse(jwtService.generateToken(user.getUsername()), user.getUsername(), user.getFirstName(),
+				user.getLastName(), user.getEmail(), user.getAge(), user.getGender());
 	}
 
 }

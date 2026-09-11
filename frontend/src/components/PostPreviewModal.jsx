@@ -4,7 +4,7 @@ import PostHeader from './PostHeader'
 import PostLocation from './PostLocation'
 import PostPhotos from './PostPhotos'
 
-function PostPreviewModal({ show, onClose, description, photos, location, onDelete, onPublish, publishing }) {
+function PostPreviewModal({ show, onClose, username, description, photos, location, onDelete, onPublish, publishing }) {
   const hasLocation = Boolean(location)
   const previewPhotos = photos.map((file, index) => ({
     id: index,
@@ -19,7 +19,7 @@ function PostPreviewModal({ show, onClose, description, photos, location, onDele
       </Modal.Header>
       <Modal.Body>
         <Card className="overflow-hidden">
-          <PostHeader username="demo" createdAt={new Date().toISOString()} />
+          <PostHeader username={username} createdAt={new Date().toISOString()} />
           <PostPhotos photos={previewPhotos} resolveSrc={(photo) => photo.previewUrl} />
           <Card.Body>
             {description && <PostDescription text={description} />}

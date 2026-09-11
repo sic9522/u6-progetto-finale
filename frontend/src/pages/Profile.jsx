@@ -1,10 +1,7 @@
+import PostFeed from '../components/PostFeed'
+
 function Profile() {
-  return (
-    <div>
-      <h1 className="h3 mb-3">Profilo</h1>
-      <p className="text-muted">Sezione in arrivo (documenti e dati utente).</p>
-    </div>
-  )
+  return <PostFeed title="I miei post" mine emptyMessage='Non hai ancora creato nessun post. Creane uno da "Nuovo post".' />
 }
 
 export default Profile

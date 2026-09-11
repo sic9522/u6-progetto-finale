@@ -40,8 +40,8 @@ public class PostController {
 	}
 
 	@GetMapping
-	public List<PostResponse> list() {
-		return postService.listPosts();
+	public List<PostResponse> list(@RequestParam(required = false, defaultValue = "false") boolean mine) {
+		return postService.listPosts(mine);
 	}
 
 	@GetMapping("/{id}")

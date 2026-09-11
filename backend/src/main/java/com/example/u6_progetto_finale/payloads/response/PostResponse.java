@@ -10,6 +10,7 @@ import com.example.u6_progetto_finale.entities.Post;
 public record PostResponse(
 		UUID id,
 		UUID userId,
+		String username,
 		BigDecimal latitude,
 		BigDecimal longitude,
 		String address,
@@ -21,6 +22,7 @@ public record PostResponse(
 		return new PostResponse(
 			post.getId(),
 			post.getUser().getId(),
+			post.getUser().getUsername(),
 			post.getLatitude(),
 			post.getLongitude(),
 			post.getAddress(),
