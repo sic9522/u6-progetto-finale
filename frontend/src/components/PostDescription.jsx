@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { Modal } from 'react-bootstrap'
 
 function PostDescription({ text }) {
   const textRef = useRef(null)
-  const [expanded, setExpanded] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [truncated, setTruncated] = useState(false)
 
   // Il clamp CSS taglia visivamente a 2 righe: si confronta l'altezza reale del testo
@@ -17,24 +18,23 @@ function PostDescription({ text }) {
     <div>
       <h3 className="h6 mb-1">Descrizione</h3>
       <div className="position-relative post-description">
-        <p ref={textRef} className={`mb-0 small ${expanded ? '' : 'post-description-clamp'}`}>
+        <p ref={textRef} className="mb-0 small post-description-clamp">
           {text}
         </p>
-        {truncated && !expanded && (
-          <button type="button" className="post-description-more" onClick={() => setExpanded(true)}>
-            Mostra altro
+        {truncated && (
+          <button type="button" className="post-description-more" onClick={() => setShowModal(true)}>
+            Mostra descrizione
           </button>
         )}
       </div>
-      {truncated && expanded && (
-        <button
-          type="button"
-          className="btn btn-link btn-sm p-0 text-decoration-none"
-          onClick={() => setExpanded(false)}
-        >
-          Riduci descrizione
-        </button>
-      )}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title className="h6 mb-0">Descrizione</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="small" style={{ whiteSpace: 'pre-wrap' }}>
+          {text}
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }

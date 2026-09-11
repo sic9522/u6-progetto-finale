@@ -14,14 +14,16 @@ const imageStyle = { width: '100%', height: PHOTO_HEIGHT, objectFit: 'cover', cu
 // Nel feed le foto arrivano gia' salvate e si leggono dall'API; nell'anteprima del composer
 // sono ancora File locali, quindi il chiamante passa resolveSrc per usare un object URL.
 function PostPhotos({ photos, resolveSrc = (photo) => `${API_URL}/api/photos/${photo.id}/content` }) {
-  const [lightboxPhoto, setLightboxPhoto] = useState(null)
+  const [lightboxIndex, setLightboxIndex] = useState(null)
 
   const lightbox = (
     <PhotoLightbox
-      show={lightboxPhoto !== null}
-      onClose={() => setLightboxPhoto(null)}
-      src={lightboxPhoto ? resolveSrc(lightboxPhoto) : null}
-      alt={lightboxPhoto?.originalName}
+      show={lightboxIndex !== null}
+      onClose={() => setLightboxIndex(null)}
+      photos={photos}
+      initialIndex={lightboxIndex ?? 0}
+      resolveSrc={resolveSrc}
+      altOf={(photo) => photo.originalName}
     />
   )
 
@@ -33,7 +35,7 @@ function PostPhotos({ photos, resolveSrc = (photo) => `${API_URL}/api/photos/${p
           src={resolveSrc(photo)}
           alt={photo.originalName}
           style={imageStyle}
-          onClick={() => setLightboxPhoto(photo)}
+          onClick={() => setLightboxIndex(0)}
         />
         {lightbox}
       </>
@@ -52,7 +54,7 @@ function PostPhotos({ photos, resolveSrc = (photo) => `${API_URL}/api/photos/${p
                 src={resolveSrc(photo)}
                 alt={photo.originalName}
                 style={imageStyle}
-                onClick={() => setLightboxPhoto(photo)}
+                onClick={() => setLightboxIndex(photos.indexOf(photo))}
               />
             </SwiperSlide>
           ))}
