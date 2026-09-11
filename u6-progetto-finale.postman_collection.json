@@ -1,0 +1,261 @@
+{
+  "info": {
+    "name": "u6-progetto-finale",
+    "description": "Collezione delle API del backend (Spring Boot). Dopo aver fatto Login o Registrati il token viene salvato da solo nella variabile {{token}} e usato dalle altre richieste.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "token", "value": "" },
+    { "key": "postId", "value": "" },
+    { "key": "photoId", "value": "" },
+    { "key": "documentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registrati",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Mario\",\n  \"lastName\": \"Rossi\",\n  \"email\": \"mario.rossi@example.com\",\n  \"username\": \"mariorossi\",\n  \"password\": \"password123\",\n  \"age\": 30,\n  \"gender\": \"M\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"mariorossi\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Post",
+      "item": [
+        {
+          "name": "Crea post",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "files", "type": "file", "src": [] },
+                { "key": "description", "value": "Descrizione del post", "type": "text" },
+                { "key": "address", "value": "Via Roma 1, Milano", "type": "text" },
+                { "key": "latitude", "value": "45.4642", "type": "text" },
+                { "key": "longitude", "value": "9.1900", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/api/posts", "host": ["{{baseUrl}}"], "path": ["api", "posts"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('postId', body.id);",
+                  "    if (body.photos && body.photos.length) {",
+                  "        pm.collectionVariables.set('photoId', body.photos[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lista post",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?mine=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [{ "key": "mine", "value": "false" }]
+            }
+          }
+        },
+        {
+          "name": "I miei post",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?mine=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [{ "key": "mine", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "Dettaglio post",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["api", "posts", "{{postId}}"] }
+          }
+        },
+        {
+          "name": "Elimina post",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/posts/{{postId}}", "host": ["{{baseUrl}}"], "path": ["api", "posts", "{{postId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Foto",
+      "item": [
+        {
+          "name": "Contenuto foto",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/photos/{{photoId}}/content", "host": ["{{baseUrl}}"], "path": ["api", "photos", "{{photoId}}", "content"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Geocoding",
+      "item": [
+        {
+          "name": "Indirizzo -> coordinate",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/geocode?address=Via Roma 1, Milano",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geocode"],
+              "query": [{ "key": "address", "value": "Via Roma 1, Milano" }]
+            }
+          }
+        },
+        {
+          "name": "Coordinate -> indirizzo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/geocode/reverse?latitude=45.4642&longitude=9.1900",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "geocode", "reverse"],
+              "query": [
+                { "key": "latitude", "value": "45.4642" },
+                { "key": "longitude", "value": "9.1900" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "OCR",
+      "item": [
+        {
+          "name": "Estrai testo da foto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": [] }]
+            },
+            "url": { "raw": "{{baseUrl}}/api/ocr", "host": ["{{baseUrl}}"], "path": ["api", "ocr"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documenti",
+      "item": [
+        {
+          "name": "Carica documento",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": [] }]
+            },
+            "url": { "raw": "{{baseUrl}}/api/documents", "host": ["{{baseUrl}}"], "path": ["api", "documents"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('documentId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lista documenti",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/documents", "host": ["{{baseUrl}}"], "path": ["api", "documents"] }
+          }
+        },
+        {
+          "name": "Dettaglio documento",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/documents/{{documentId}}", "host": ["{{baseUrl}}"], "path": ["api", "documents", "{{documentId}}"] }
+          }
+        },
+        {
+          "name": "Contenuto documento",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/documents/{{documentId}}/content", "host": ["{{baseUrl}}"], "path": ["api", "documents", "{{documentId}}", "content"] }
+          }
+        }
+      ]
+    }
+  ]
+}
