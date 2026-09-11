@@ -129,3 +129,39 @@ h6,
 .composer-textarea::placeholder {
   color: var(--brand-text-muted);
 }
+
+/* Data/ora del post: marcatura leggera in alto a destra, non in competizione con lo username. */
+.post-timestamp {
+  font-size: 0.75rem;
+  color: var(--brand-text-muted);
+  white-space: nowrap;
+}
+
+/* Descrizione del post: troncata a due righe, con "Mostra altro" che appare solo al passaggio del mouse. */
+.post-description-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-description-more {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  border: none;
+  background: linear-gradient(to right, transparent, var(--bs-card-bg, #fff) 40%);
+  padding: 0 0 0 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brand-accent);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.post-description:hover .post-description-more {
+  opacity: 1;
+}
+
+/* Menu "tre puntini" del post: nessuna freccina, e' gia' un'icona a se'. */
+.no-caret::after {
+  display: none;
+}

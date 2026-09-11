@@ -9,10 +9,12 @@ const API_URL = import.meta.env.VITE_API_URL
 const PHOTO_HEIGHT = 360
 const imageStyle = { width: '100%', height: PHOTO_HEIGHT, objectFit: 'cover' }
 
-function PostPhotos({ photos }) {
+// Nel feed le foto arrivano gia' salvate e si leggono dall'API; nell'anteprima del composer
+// sono ancora File locali, quindi il chiamante passa resolveSrc per usare un object URL.
+function PostPhotos({ photos, resolveSrc = (photo) => `${API_URL}/api/photos/${photo.id}/content` }) {
   if (photos.length === 1) {
     const photo = photos[0]
-    return <img src={`${API_URL}/api/photos/${photo.id}/content`} alt={photo.originalName} style={imageStyle} />
+    return <img src={resolveSrc(photo)} alt={photo.originalName} style={imageStyle} />
   }
 
   return (
@@ -22,7 +24,7 @@ function PostPhotos({ photos }) {
       <Swiper modules={[Navigation, Pagination]} navigation pagination={{ clickable: true }} style={{ height: '100%' }}>
         {photos.map((photo) => (
           <SwiperSlide key={photo.id}>
-            <img src={`${API_URL}/api/photos/${photo.id}/content`} alt={photo.originalName} style={imageStyle} />
+            <img src={resolveSrc(photo)} alt={photo.originalName} style={imageStyle} />
           </SwiperSlide>
         ))}
       </Swiper>

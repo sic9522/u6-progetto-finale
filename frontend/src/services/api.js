@@ -20,8 +20,16 @@ export function listPosts() {
   return api.get('/api/posts').then((res) => res.data)
 }
 
+export function deletePost(id) {
+  return api.delete(`/api/posts/${id}`).then((res) => res.data)
+}
+
 export function reverseGeocode(latitude, longitude) {
   return api.get('/api/geocode/reverse', { params: { latitude, longitude } }).then((res) => res.data)
+}
+
+export function extractText(formData) {
+  return api.post('/api/ocr', formData).then((res) => res.data)
 }
 
 export default api

@@ -24,7 +24,7 @@ function writeLastLocation(location) {
   }
 }
 
-function LocationModal({ show, onClose }) {
+function LocationModal({ show, onClose, onConfirm }) {
   const { maps, places, marker, error: mapsError } = useGoogleMaps()
   const containerRef = useRef(null)
   const mapRef = useRef(null)
@@ -148,6 +148,7 @@ function LocationModal({ show, onClose }) {
   function handleConfirm() {
     if (location) {
       writeLastLocation(location)
+      onConfirm?.(location)
     }
     onClose()
   }
