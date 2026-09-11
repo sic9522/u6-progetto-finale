@@ -1,6 +1,9 @@
 package com.example.u6_progetto_finale.service;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +11,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +24,7 @@ import com.example.u6_progetto_finale.entities.User;
 import com.example.u6_progetto_finale.exceptions.BadRequestException;
 import com.example.u6_progetto_finale.exceptions.NotFoundException;
 import com.example.u6_progetto_finale.payloads.response.PostResponse;
+import com.example.u6_progetto_finale.repository.PhotoRepository;
 import com.example.u6_progetto_finale.repository.PostRepository;
 import com.example.u6_progetto_finale.repository.UserRepository;
 
@@ -30,14 +36,16 @@ public class PostService {
 	private static final Set<String> ALLOWED_PHOTO_TYPES = Set.of("image/png", "image/jpeg");
 
 	private final PostRepository postRepository;
+	private final PhotoRepository photoRepository;
 	private final UserRepository userRepository;
 	private final FileStorage fileStorage;
 	private final PhotoUploadProperties properties;
 	private final Path photosDir;
 
-	public PostService(PostRepository postRepository, UserRepository userRepository,
+	public PostService(PostRepository postRepository, PhotoRepository photoRepository, UserRepository userRepository,
 			FileStorage fileStorage, PhotoUploadProperties properties) {
 		this.postRepository = postRepository;
+		this.photoRepository = photoRepository;
 		this.userRepository = userRepository;
 		this.fileStorage = fileStorage;
 		this.properties = properties;
@@ -73,6 +81,19 @@ public class PostService {
 		return postRepository.findById(id)
 			.map(PostResponse::from)
 			.orElseThrow(() -> new NotFoundException("post " + id + " non trovato"));
+	}
+
+	public ResponseEntity<byte[]> readPhotoContent(UUID photoId) {
+		Photo photo = photoRepository.findById(photoId)
+			.orElseThrow(() -> new NotFoundException("foto " + photoId + " non trovata"));
+		try {
+			byte[] content = Files.readAllBytes(photosDir.resolve(photo.getStorageKey()));
+			return ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType(photo.getContentType()))
+				.body(content);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/** Prima si controlla tutto, poi si scrive: cosi' non restano file orfani se una foto non e' valida. */

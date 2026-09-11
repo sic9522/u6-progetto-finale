@@ -36,7 +36,9 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173"));
+		// 127.0.0.1 oltre a localhost: utile per bypassare un HSTS del browser
+		// rimasto agganciato a "localhost" da un altro progetto/servizio in HTTPS.
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
