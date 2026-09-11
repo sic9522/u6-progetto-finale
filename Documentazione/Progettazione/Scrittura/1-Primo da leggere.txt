@@ -1,0 +1,14 @@
+Questo è l' ordine che seguo per la creazione di un progetto:
+
+1 - leggo e ascolto in cosa consiste il progetto 
+2 - stabilisco cosa deve fare e chi deve fare le cose 
+3 - incomincio nel far generare le entities su le cose essenziali
+4 - generato il codice, controllo il codice e mi faccio generare
+    anche una descrizione di quello che ha scritto.
+5 - testo se il progetto gira ( tabelle create e che tutto giri)
+6 - faccio creare il frontend integrando le funzionalita create
+7 - creo e modifico la grafica dei progetti
+
+Non creo un prompt unico a Claude e tanto meno prendo tutte le Decisioni
+prima dell'inizio. Mi trovo bene a lavora step by step. Controllare,
+modificare e aggiungere in corso d'opera.

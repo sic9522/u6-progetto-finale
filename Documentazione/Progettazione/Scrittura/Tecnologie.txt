@@ -1,0 +1,28 @@
+Librerie e tecnologie usate:
+
+Backend:
+
+    Spring Boot (data-jpa, security, validation, webmvc, restclient) - ossatura dell'API REST
+    PostgreSQL - database
+    Lombok - getter/setter/costruttori senza scriverli ovunque a mano (i costruttori restano scritti a mano, mai @AllArgsConstructor)
+    Tess4j - binding Java di Tesseract, per l'OCR sui documenti e sulle foto
+    JJWT - libreria per i JWT, già in progetto ma non ancora attiva: login e registrazione sono un extra rimandato al branch extra
+    spring-boot-starter-websocket - stesso discorso, scaffolding pronto ma non usato per ora
+
+Frontend:
+
+    React + Vite - l'app
+    Bootstrap 5 / react-bootstrap - componenti e stile di base
+    react-router-dom - le pagine (Home, Profilo, Amici, Canale)
+    axios - chiamate all'API
+    @googlemaps/js-api-loader - mappa interattiva per scegliere la posizione del post
+    swiper - carosello per i post con più foto
+    @phosphor-icons/react - icone (niente emoji usate come icone)
+    @stomp/stompjs + sockjs-client - anche questi già in progetto per un eventuale websocket, non usati per ora
+
+Perché queste e non altre:
+ dove Spring Boot ha già uno starter pronto (data-jpa, security, validation) lo si usa invece di
+scrivere la parte a mano. Stesso discorso lato frontend con Bootstrap: niente Tailwind o CSS scritto
+da zero, solo le variabili CSS di Bootstrap 5.3 sovrascritte per il tema. Le librerie di autenticazione
+e websocket restano installate ma inattive perché in questa fase non servono: si preferisce avere
+già la struttura pronta piuttosto che aggiungerla più avanti e rischiare di dover rifare lo schema.

@@ -1,0 +1,64 @@
+Decisioni prese durante lo sviluppo:
+
+Fase 1 vs fase 2:
+
+    su main solo quello richiesto dalle slide - post con foto, posizione, documenti con OCR
+    login, registrazione e tutto il resto non citato nelle slide rimandato al branch extra
+
+Utente senza login in fase 1:
+
+    un utente seed di default a cui agganciare fin da subito post e documenti
+    così quando arriva il login vero basta collegare l'utente autenticato, senza dover
+    migrare tabelle già popolate
+
+Posizione sul post:
+
+    latitude/longitude/address come colonne dirette su Post, non una tabella Location a parte
+    un post ha al massimo una posizione, una tabella in più sarebbe solo un join inutile
+
+Geolocalizzazione:
+
+    Google Maps JS lato frontend per la mappa (la chiave si limita via referrer, può stare nel client)
+    Google Geocoding API v4 lato backend per indirizzo <-> coordinate, chiave solo server-side
+    geocodifiche tenute in cache a database per 30 giorni, non si richiama Google due volte
+    per lo stesso indirizzo
+
+OCR:
+
+    Tesseract via Tess4j, lingua inglese di default perché sulla macchina di sviluppo
+    è installato solo eng.traineddata
+    lingua configurabile da application.properties, cambiarla non tocca il codice
+
+Validazione file:
+
+    formato vero letto dai primi byte del file (firma PNG/JPEG/PDF), mai dal Content-Type
+    dichiarato dal client
+
+Storage:
+
+    filesystem locale, nome file generato con UUID, i metadati (nome originale, tipo,
+    dimensione) a database
+
+Foto da fotocamera:
+
+    getUserMedia per aprire lo stream, cattura su canvas con resize
+    se la fotocamera non è disponibile o il permesso viene negato resta comunque
+    il caricamento file da input
+
+Id e timestamp:
+
+    UUID al posto degli interi auto-incrementali, per non avere id indovinabili
+    Instant al posto di OffsetDateTime: si registra solo il momento in UTC, il fuso
+    orario qui non serve
+
+Descrizione, anteprima e eliminazione dei post:
+
+    aggiunta la descrizione testuale al post (all'inizio non c'era, il testo scritto
+    nel composer non veniva salvato da nessuna parte)
+    prima di pubblicare si vede un'anteprima identica a come apparirà nel feed
+    un post si può eliminare dal menu a tre puntini, cancella anche le foto salvate su disco
+
+Canale:
+
+    solo grafica per ora, come Profilo e Amici - salvato in locale nel browser,
+    nessun backend dietro
