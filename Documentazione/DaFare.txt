@@ -1,0 +1,6 @@
+Documentazione da finire a fine progetto:
+
+- frontend (pagine/componenti) - CreatePost, PhotoPicker, LocationPicker, hook mappa
+- librerie e servizi esterni usati (Google Maps JS API, Geocoding API v4, Tesseract/tess4j, ecc)
+- aggiornare il DrawSQL con le tabelle aggiunte dopo lo screenshot (geocode_cache, e quello che arriva con i documenti)
+- screenshot Postman e pgAdmin, quando le API sono complete

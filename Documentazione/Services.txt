@@ -1,0 +1,26 @@
+Creazione service:
+
+PostService:
+
+    valida le foto prima di salvarle - formato vero del file, dimensione, quante sono
+    l'utente è sempre quello di default per ora, non c'è login
+    crea il post, più lista e dettaglio
+
+GeocodingService:
+
+    chiama la Geocoding API v4 di Google, indirizzo <-> coordinate
+    tiene una cache a database per 30 giorni così non richiama Google per lo stesso indirizzo due volte
+
+FileTypeCheck:
+
+    guarda i primi byte del file per capire cos'è davvero (PNG/JPEG/PDF)
+    non si fida del Content-Type che manda il client
+
+FileStorage:
+
+    scrive il file su disco con un nome generato
+
+Prompt:
+ Genera i service per creare i post, con la validazione delle foto sui byte veri del file
+e non sul Content-Type, e per il geocoding con la cache a database. Tieni separati la
+lettura del tipo file e il salvataggio su disco, servono uguali anche per i documenti.

@@ -1,0 +1,18 @@
+Creazione controller:
+
+PostController:
+
+    POST /api/posts - multipart, le foto + posizione opzionale (lat/lng/indirizzo)
+    GET /api/posts - lista
+    GET /api/posts/{id} - dettaglio con le foto
+
+GeocodeController:
+
+    GET /api/geocode - indirizzo, restituisce le coordinate
+    GET /api/geocode/reverse - il contrario, da coordinate a indirizzo
+
+Prompt:
+ Genera i controller per post e geocoding (nomi sopra) con questi endpoint.
+Le foto arrivano in multipart, il geocoding invece prende i parametri da query string.
+Non restituire mai le entity così come sono, sempre un DTO. Gli errori vanno
+sull'ErrorHandler che c'è già, non crearne un altro.
