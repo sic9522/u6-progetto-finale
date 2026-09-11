@@ -7,15 +7,21 @@ spring.jpa.show-sql=true
 server.port=3001
 jwt.secret=changeme
 
-# Upload foto
-spring.servlet.multipart.max-file-size=5MB
+# Upload foto e documenti (il limite multipart e' globale, vale per entrambi)
+spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=50MB
 app.uploads.photos.dir=uploads/photos
 app.uploads.photos.max-files=10
 app.uploads.photos.max-file-size-bytes=5242880
+app.uploads.documents.dir=uploads/documents
+app.uploads.documents.max-file-size-bytes=10485760
 
 # Geocoding (Google Geocoding API v4) - chiave solo lato server, mai esposta al frontend
 app.google.geocoding.api-key=${GOOGLE_GEOCODING_API_KEY:}
 app.google.geocoding.language=it
 app.google.geocoding.region=IT
 app.google.geocoding.cache-ttl=30d
+
+# OCR (Tesseract via tess4j)
+ocr.tessdata-path=${TESSDATA_PATH:C:/Program Files/Tesseract-OCR/tessdata}
+ocr.language=${OCR_LANGUAGE:eng}

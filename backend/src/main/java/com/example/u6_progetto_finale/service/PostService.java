@@ -1,7 +1,5 @@
 package com.example.u6_progetto_finale.service;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -58,10 +56,10 @@ public class PostService {
 		post.setAddress(address == null || address.isBlank() ? null : address.strip());
 
 		for (MultipartFile file : files) {
-			byte[] content = readBytes(file);
+			byte[] content = MultipartFiles.readBytes(file);
 			String contentType = FileTypeCheck.detect(content);
 			String storageKey = fileStorage.save(photosDir, content, extensionOf(contentType));
-			post.getPhotos().add(new Photo(post, storageKey, safeName(file.getOriginalFilename()), contentType, content.length));
+			post.getPhotos().add(new Photo(post, storageKey, MultipartFiles.safeName(file.getOriginalFilename()), contentType, content.length));
 		}
 
 		return PostResponse.from(postRepository.save(post));
@@ -87,7 +85,7 @@ public class PostService {
 			reasons.add("troppe foto: massimo " + properties.maxFiles());
 		} else {
 			for (MultipartFile file : files) {
-				String name = safeName(file.getOriginalFilename());
+				String name = MultipartFiles.safeName(file.getOriginalFilename());
 				if (file.isEmpty()) {
 					reasons.add(name + ": file vuoto");
 					continue;
@@ -96,7 +94,7 @@ public class PostService {
 					reasons.add(name + ": supera la dimensione massima di " + properties.maxFileSizeBytes() + " byte");
 					continue;
 				}
-				String realType = FileTypeCheck.detect(readBytes(file));
+				String realType = FileTypeCheck.detect(MultipartFiles.readBytes(file));
 				if (realType == null || !ALLOWED_PHOTO_TYPES.contains(realType)) {
 					reasons.add(name + ": formato non ammesso (sono accettati solo PNG e JPEG)");
 				}
@@ -108,27 +106,12 @@ public class PostService {
 		}
 	}
 
-	private String safeName(String originalFilename) {
-		if (originalFilename == null || originalFilename.isBlank()) {
-			return "senza-nome";
-		}
-		return Path.of(originalFilename.replace('\\', '/')).getFileName().toString();
-	}
-
 	private String extensionOf(String contentType) {
 		return switch (contentType) {
 			case "image/png" -> ".png";
 			case "image/jpeg" -> ".jpg";
 			default -> "";
 		};
-	}
-
-	private byte[] readBytes(MultipartFile file) {
-		try {
-			return file.getBytes();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
 	}
 
 }
