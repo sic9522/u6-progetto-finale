@@ -1,0 +1,30 @@
+package com.example.u6_progetto_finale.payloads.response;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+import com.example.u6_progetto_finale.entities.Post;
+
+public record PostResponse(
+		UUID id,
+		UUID userId,
+		BigDecimal latitude,
+		BigDecimal longitude,
+		String address,
+		Instant createdAt,
+		List<PhotoResponse> photos) {
+
+	public static PostResponse from(Post post) {
+		return new PostResponse(
+			post.getId(),
+			post.getUser().getId(),
+			post.getLatitude(),
+			post.getLongitude(),
+			post.getAddress(),
+			post.getCreatedAt(),
+			post.getPhotos().stream().map(PhotoResponse::from).toList());
+	}
+
+}

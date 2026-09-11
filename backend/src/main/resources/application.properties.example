@@ -6,3 +6,9 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 server.port=3001
 jwt.secret=changeme
+
+# Upload foto
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=50MB
+app.uploads.photos.dir=uploads/photos
+app.uploads.photos.max-files=10

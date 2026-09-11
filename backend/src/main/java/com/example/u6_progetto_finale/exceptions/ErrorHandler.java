@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.example.u6_progetto_finale.payloads.response.ErrorResponse;
 
@@ -34,6 +35,12 @@ public class ErrorHandler {
 	@ExceptionHandler(BadRequestException.class)
 	public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException e) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+	}
+
+	/** Oltre il limite configurato Spring solleva questa: senza traduzione l'utente vede uno stack trace. */
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ErrorResponse> handleTooLarge(MaxUploadSizeExceededException e) {
+		return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE).body(new ErrorResponse("file troppo grande"));
 	}
 
 	@ExceptionHandler(Exception.class)
