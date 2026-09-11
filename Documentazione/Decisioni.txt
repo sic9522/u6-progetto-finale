@@ -1,0 +1,36 @@
+Creazione entità:
+
+User:
+
+    id - guuid
+    username - string aggiungere unica
+    created_at - Instant
+
+Post:
+
+    id - guuid
+    ID_User - guuid (1:N)
+    latitude - decimal
+    longitude - decimal
+    created_at - Instant
+
+Photo:
+
+    id - guuid
+    ID_Post - guuid (1:N)
+    created_at - Instant
+    nome - string
+    validazione formato reale 
+    dimensioni
+
+Document:
+
+    id - guuid
+    nome - string
+    validazione ""
+    dimensioni
+    created_at - Instant
+
+Prompt:
+ Genera quattro entità ( vedi nomi sopra ) che abbiano le colonne elencate.
+Usa gli uuid, la validazione deve essere del formato reale ( controlla i primi byte del formato reale ), useremo l Api di GoogleMaps per la posizione. Le dimensioni saranno controllate sia dalla parte frontend sia dal backend.
