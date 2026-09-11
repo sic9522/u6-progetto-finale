@@ -34,3 +34,6 @@ build/
 
 ### Secrets ###
 src/main/resources/application.properties
+
+### Upload locali (contenuto utente, non va versionato) ###
+uploads/
